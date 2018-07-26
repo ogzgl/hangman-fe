@@ -4,20 +4,22 @@
 <head>
   <meta charset="utf-8" />
   <title>Hangman</title>
-  <link rel="stylesheet" type="text/css" media="screen" href="css/game.css" />
-  <script src="js/game.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href="css/game.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet">
+    <script defer src="js/game.js"></script>
 </head>
 
 <body>
-  <div class="navbar">
-    <nav>
-      <a id="logo" href="">Hangman Game</a>
-    </nav>
+  <div class="topBar">
+      <ul class="navBar">
+          <li class="homeNavigator">HANGMAN</li>
+          <li class="howToPlay">HOW TO PLAY?</li>
+      </ul>
   </div>
   <div class="container">
     <div class="information">
       <h3><img src="img/info-16.png">  Game State</h3>
-      <h3><img src="img/diamond.png">  100</h3>
+      <h3><img src="img/diamond24.png">  100</h3>
       <h3>Category:<label>_ _ _ _ _</label></h3>
     </div>
 
@@ -56,36 +58,62 @@
       </div>
   </div>
 
-  <div class="cards">
-    <div class="risk"  title="This is my tooltip">
-      <h2>Risk</h2>
-      <h5>Cost:20</h5>
-      <h5>Remaining: 1</h5>
+  <div class="cardContainer">
+    <div class="card" title="This is my tooltip">
+        <div class="cardTop">
+            <button class="info"><img src="img/information-symbol.png"></button>            <h4>Risk</h4>
+        </div>
+        <div class="cardBottom">
+            <label><img src="img/item-interconnections.png">: 1<br></label>
+            <label><img src="img/diamond24.png">  : 20</label>
+            <button id="risk"><label>USE</label></button>
+        </div>
     </div>
 
-    <div class="consolation">
-      <h2>Consolation</h2>
-      <h5>Cost:20</h5>
-      <h5>Remaining: 1</h5>
+    <div class="card">
+        <div class="cardTop">
+            <button class="info"><img src="img/information-symbol.png"></button>
+            <h4>Consolation</h4>
+        </div>
+        <div class="cardBottom">
+            <label><img src="img/item-interconnections.png">: 1<br></label>
+            <label><img src="img/diamond24.png">  : 20</label>
+            <button id="consolation"><label>USE</label></button>
+        </div>
     </div>
 
-    <div class="discount">
-      <h2>Discount</h2>
-      <h5>Cost:20</h5>
-      <h5>Remaining: 1</h5>
+    <div class="card">
+        <div class="cardTop">
+            <button class="info"><img src="img/information-symbol.png"></button>            <h4>Discount</h4>
+        </div>
+        <div class="cardBottom">
+            <label><img src="img/item-interconnections.png">: 1<br></label>
+            <label><img src="img/diamond24.png">  : 20</label>
+            <button id="discount"><label>USE</label></button>
+        </div>
     </div>
 
-    <div class="buyletter">
-      <h2>Buy a Letter</h2>
-      <h5>Cost:20</h5>
-      <h5>Remaining: 1</h5>
+    <div class="card">
+        <div class="cardTop">
+            <button class="info"><img src="img/information-symbol.png"></button>            <h4>Buy a Letter</h4>
+        </div>
+        <div class="cardBottom">
+            <label><img src="img/item-interconnections.png">: 1<br></label>
+            <label><img src="img/diamond24.png">  : 20</label>
+            <button id="buyaletter"><label>USE</label></button>
+        </div>
     </div>
 
-
-    <div class="category">
-      <h2>Category</h2>
-      <h5>Cost:20</h5>
-      <h5>Remaining: 1</h5>
+    <div class="card">
+        <div class="cardTop">
+            <button class="info"><img src="img/information-symbol.png"></button>
+            <h4>Category</h4>
+        </div>
+        <div class="cardBottom">
+            <label><img src="img/item-interconnections.png"> : 1<br></label>
+            <label><img src="img/diamond24.png">  : 20</label>
+            <button id="category"><label>USE</label></button>
+        </div>
     </div>
 
   </div>
