@@ -1,139 +1,152 @@
-.container{
-  margin-top: 2%;
-  display: flex;
-  flex-wrap: nowrap;
-  font-family: 'Work Sans', sans-serif;
+.container {
+    margin-top: 2%;
+    display: flex;
+    flex-wrap: nowrap;
+    font-family: 'Work Sans', sans-serif;
 }
 
-.topBar{
-  margin-top: -1em;
-  margin-left: -1em;
-  margin-right: -0.5em;
-  height: 45px;
-  border-bottom: 0.5px solid gray;
+.topBar {
+    margin-top: -1em;
+    margin-left: -1em;
+    margin-right: -0.5em;
+    height: 45px;
+    border-bottom: 0.5px solid gray;
 }
 
-.navBar{
-  font-family: 'Work Sans', sans-serif;
-  display: flex;
-  padding: 0 0;
-  list-style: none;
+.navBar {
+    font-family: 'Work Sans', sans-serif;
+    display: flex;
+    padding: 0 0;
+    list-style: none;
 }
 
-.homeNavigator{
-  margin-left: 2%;
-  margin-top: 1%;
-  padding-right: 4px;
-  margin-right: auto;
-  border-right: 0.5px solid gray;
-}
-.howToPlay{
-  margin-right: 2%;
-  margin-top: 1%;
-  margin-left: auto;
+.homeNavigator {
+    margin-left: 2%;
+    margin-top: 1%;
+    padding-right: 4px;
+    margin-right: auto;
+    border-right: 0.5px solid gray;
 }
 
-.container .information{
-  padding-left: 4%;
-  width: 33.3%;
-  left : 0;
-}
-.container .game{
-  display: block;
-  left:33.3%;
-  width: 33.3%;
+.howToPlay {
+    margin-right: 2%;
+    margin-top: 1%;
+    margin-left: auto;
 }
 
-.game img{
-  margin-left: 20%;
-  color: #0D77B7;
-}
-.container .alphabet{
-  left:66.6%;
-  width: 33.3%;
-  margin-right: 4%;
-  padding-left: 4%;
-  display: flex;
-  flex-wrap: wrap;
+.container .information {
+    padding-left: 4%;
+    width: 33.3%;
+    left: 0;
 }
 
-.container .alphabet button{
-  display: block;
-  height: 50px;
-  width: 50px;
-  padding: 1px;
-  border-radius: 50px 50px 50px 50px;
-  border-color: transparent;
-  background: #0D77B7;
-  margin: 1% 1% 1% 1%;
+.container .game {
+    display: inline-block;
+    left: 33.3%;
+    width: 33.3%;
+}
+
+.game img {
+    color: #0D77B7;
+}
+
+.game h2 button {
+    display: block;
+    height: 40px;
+    width: 40px;
+    padding: 1px;
+    border-radius: 40px 40px 40px 40px;
+    border: 1px solid #0D77B7;
+}
+
+.container #alphabet {
+    left: 66.6%;
+    width: 33.3%;
+    margin-right: 4%;
+    padding-left: 4%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#alphabet button {
+    display: block;
+    height: 50px;
+    width: 50px;
+    padding: 1px;
+    border-radius: 50px 50px 50px 50px;
+    border-color: transparent;
+    background: #0D77B7;
+    margin: 1% 1% 1% 1%;
 
 }
 
-.cardContainer{
-  margin-top: 1%;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
+#cardContainer {
+    margin-top: 1%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
 }
 
-
-.card{
-  border: 1px solid gray;
-  margin: 1% 1% 0 1%;
-  border-radius: 3% 3% 10% 3%;
-  width: 15%;
-  max-width: 15%;
-}
-.cardTop{
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-bottom: 1px dashed gray;
+.card {
+    border: 1px solid gray;
+    margin: 1% 1% 0 1%;
+    border-radius: 3% 3% 10% 3%;
+    width: 15%;
+    max-width: 15%;
 }
 
-.info{
-  display: block;
-  height: 40px;
-  width: 40px;
-  padding: 1px;
-  border-radius: 50px 50px 50px 50px;
-  border-color: transparent;
-  background: #0D77B7;
-  pointer-events: none;
-  cursor: default;
+.cardTop {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-bottom: 1px dashed gray;
 }
 
-.cardBottom{
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.info {
+    display: block;
+    height: 40px;
+    width: 40px;
+    padding: 1px;
+    border-radius: 50px 50px 50px 50px;
+    border-color: transparent;
+    background: #0D77B7;
+    pointer-events: none;
+    cursor: default;
 }
 
-.cardBottom label{
-  margin-top: 2%;
+.cardBottom {
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.cardBottom button{
-  width: 100%;
-  border-radius: 0 3px 15px 0;
-  background: #0D77B7;
-  border-color: transparent;
-  margin-top: 3%;
-}
-.cardBottom button label{
-  color: #FFFFFF;
+.cardBottom label {
+    margin-top: 2%;
 }
 
-.footer{
-  display: flex;
-  justify-content: center;
-  margin-top: 3%;
+.cardBottom button {
+    width: 100%;
+    border-radius: 0 3px 15px 0;
+    background: #0D77B7;
+    border-color: transparent;
+    margin-top: 3%;
 }
-.footer label{
-  font-size: 0.7em;
-  color: gray;
+
+.cardBottom button label {
+    color: #FFFFFF;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 3%;
+}
+
+.footer label {
+    font-size: 0.7em;
+    color: gray;
 }
