@@ -46,18 +46,11 @@
     width: 33.3%;
 }
 
+
 .game img {
     color: #0D77B7;
 }
 
-.game h2 button {
-    display: block;
-    height: 40px;
-    width: 40px;
-    padding: 1px;
-    border-radius: 40px 40px 40px 40px;
-    border: 1px solid #0D77B7;
-}
 
 .container #alphabet {
     left: 66.6%;
@@ -68,6 +61,17 @@
     flex-wrap: wrap;
 }
 
+#giveUpBtn{
+    display: block;
+    height: 45px;
+    width: 90px;
+    padding: 1px;
+    border-radius: 40px 40px 40px 40px;
+    border: 1px solid #0D77B7;
+    background: #0D77B7;
+    color: white;
+}
+
 #alphabet button {
     display: block;
     height: 50px;
@@ -76,6 +80,7 @@
     border-radius: 50px 50px 50px 50px;
     border-color: transparent;
     background: #0D77B7;
+    color : white;
     margin: 1% 1% 1% 1%;
 
 }

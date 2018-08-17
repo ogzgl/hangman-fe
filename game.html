@@ -6,7 +6,7 @@
   <title>Hangman</title>
   <link rel="stylesheet" type="text/css" media="screen" href="css/game.css"/>
     <link href="https://fonts.googleapis.com/css?family=Work+Sans:700" rel="stylesheet">
-  <script defer src="js/game.js"></script>
+  <script defer src="js/game2.js"></script>
 </head>
 
 <body>
@@ -16,22 +16,23 @@
           <li class="howToPlay">HOW TO PLAY?</li>
       </ul>
   </div>
-  <div class="container">
-    <div class="information">
-      <h3><img src="img/info-16.png">  Game State</h3>
-      <h3><img src="img/diamond24.png">  100</h3>
-      <h3>Category:<label>_ _ _ _ _</label></h3>
-    </div>
+  <div id="mainArea">
+    <!-- <div class="container">
+      <div class="information"> 
+        <h3><img src="img/info-16.png"><label id="gameState"></label></h3>
+        <h3><img src="img/diamond24.png"><label id="userPoint"></label></h3>
+        <h3>Category:<label id="category"></label></h3>
+        <button id="giveUpBtn">Give Up</button>
+      </div>
 
-    <div class="game">
-      <h2><label>_ _ _ _ _ _ _ _</label><button><img style="float: left" src="img/rectangular-flag.png"><br>Give Up</button></h2>
-      <img src="img/man-on-a-chair-before-suicide-with-a-hanging-rope.png">
-    </div>
+      <div class="game">
+        <h2>Word:<label id="secretWord"></label></h2>
+      </div> 
 
-    <div id="alphabet"></div>
+      <div id="alphabet"></div>
+    </div>
+    <div id="cardContainer"></div> -->
   </div>
-
-  <div id="cardContainer"></div>
   <div class="footer">
     <label>Oğuz GÜL</label>
   </div>
