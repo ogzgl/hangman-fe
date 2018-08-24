@@ -148,10 +148,20 @@
 .footer {
     display: flex;
     justify-content: center;
-    margin-top: 3%;
+    position:absolute;
+    bottom: 0;
+    width: 100%;
 }
 
 .footer label {
     font-size: 0.7em;
     color: gray;
+}
+
+
+.entryContainer{
+    margin-top: 20%;
+    align-items: center;
+    display: flex;
+    justify-content: center;
 }
