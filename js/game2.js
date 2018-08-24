@@ -20,9 +20,8 @@ function requestHandler(method, url, body) {
 }
 
 let alphabet = {
-
+    a:5
 };
-
 let cards = {
     "risk": {cost: 8, limit: 2},
     "consolation": {cost: 5, limit: 1},
