@@ -61,7 +61,7 @@
     flex-wrap: wrap;
 }
 
-#giveUpBtn{
+.giveUpBtn{
     display: block;
     height: 45px;
     width: 90px;
@@ -70,6 +70,7 @@
     border: 1px solid #0D77B7;
     background: #0D77B7;
     color: white;
+    margin-top: 1%;
 }
 
 #alphabet button {
@@ -164,4 +165,5 @@
     align-items: center;
     display: flex;
     justify-content: center;
+    flex-direction: column;
 }
