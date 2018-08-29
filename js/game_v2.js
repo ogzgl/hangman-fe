@@ -1,7 +1,6 @@
 const configModule = function() {
     let alphabetConf = {}
     let cardsConf = {}  
-    //fix this too.
     let ingameCards = {}
     function setAlphabet(response){
         alphabetConf = response.alphabetCost;
@@ -11,7 +10,6 @@ const configModule = function() {
     }
 
     function addCard(response){
-        //TODO fix this later.
         cardsConf.buyletter = response.buyletter;
         cardsConf.consolation = response.consolation;
         cardsConf.risk      = response.risk;
@@ -20,6 +18,9 @@ const configModule = function() {
     }
     function getCards(){
         return cardsConf;
+    }
+    function getDiscount(card){
+        return cardsConf[card].discount;
     }
     function objectify(array) {
         array.forEach(element => {
@@ -35,7 +36,8 @@ const configModule = function() {
         addCard : addCard,
         getCards : getCards,
         objectify, objectify,
-        getIngameCards
+        getIngameCards,
+        getDiscount
 
     }
 
@@ -45,8 +47,167 @@ const configModule = function() {
     return result;
 }();
 
+let uiModule = function(){
+    createEntryLayout();
+    function createElement(elem,attributes){
+        let element = document.createElement(elem);
+        attributes.forEach(x => {
+          element.setAttribute(x[0],x[1]);
+        });
+        return element
+    }
+    
+    function _appendNestedElements(elem,childs){
+      childs.forEach(element => {
+        elem.appendChild(element)
+      });
+    }
+    function changeColor(elem, color){
+        elem.style.background= color;
+    }
+    function createEntryLayout(){
+        let mainArea = document.getElementById("mainArea")
+        let modalContainer = createElement("div",[["class","modal"]]);
+        let entryContainer = createElement("div",[["class","entryContainer"],["id","entryContainer"]]);
+        let closeBtn = createElement("span",[["class","close"]]);
+        let welcomeHeader = createElement("h1",[]);
+        welcomeHeader.innerText = "Welcome to Hangman";
+        let levelSelect = createElement("select",[["id","ddlLevel"]]);
+        let levels = ["easy","medium","hard"]
+        let levelOptions=[]
+        for(let i=0;i<levels.length;i++){
+            levelOptions.push(createElement("option",[["value",levels[i]]]));
+            levelOptions[i].innerText = levels[i].toUpperCase();
+        }
+        _appendNestedElements(levelSelect,levelOptions);
+        let creationBtn = createElement("button",[["id","createGameBtn"],["class","giveUpBtn"]]);
+        creationBtn.innerText = "Start Game";
+        _appendNestedElements(entryContainer,[closeBtn,welcomeHeader,levelSelect,creationBtn]);
+        modalContainer.appendChild(entryContainer);
+        mainArea.appendChild(entryContainer);
+        document.getElementById("createGameBtn").addEventListener("click",function(event){
+            gameInterfaceModule.btnHandler(event.target.id)
+        })
+    }
+    function createGameLayout() {
+        //TODO handle this in a better way.
+        let mainArea = document.getElementById("mainArea");
+        let gameContainer = createElement("div",[["class", "container"],["id","gameContainer"]]);
+        let gameInfo = createElement("div",[["class","information"]]);
+    
+        let gameStateHeader = createElement("h3",[]);
+        let gameStateImg    = createElement("img",[["src","img/info-16.png"]]);
+        let gameStateLabel  = createElement("label",[["id","gameState"]]);
+    
+        _appendNestedElements(gameStateHeader,[gameStateImg,gameStateLabel]);
+        gameInfo.appendChild(gameStateHeader);
+    
+        let userPointHeader = createElement("h3",[]);
+        let userPointImg    = createElement("img",[["src","img/diamond24.png"]]);
+        let userPointLabel  = createElement("label",[["id","userPoint"]]);
+        _appendNestedElements(userPointHeader,[userPointImg,userPointLabel]);
+        
+        let categoryHeader  = createElement("h3",[]);
+        categoryHeader.innerText = "Category: ";
+        let categoryLabel = createElement("label",[["id","category"]]);
+        categoryHeader.appendChild(categoryLabel);
+        gameInfo.appendChild(categoryHeader);
+    
+        let giveUpBtn = createElement("button",[["class","giveUpBtn"],["id","giveUpBtn"]]);
+        giveUpBtn.innerText = "Give Up";
+        _appendNestedElements(gameInfo,[userPointHeader,giveUpBtn]);
+    
+        gameContainer.appendChild(gameInfo);
+    
+        let secretWordArea  = createElement("div",[["class","game"]]);
+        let secretWordHeader= createElement("h2",[]);
+        secretWordHeader.innerText = "Word: ";
+        let secretWordLabel = createElement("span",[["id", "secretWord"],["class","secretWordGame"]]);
+        secretWordHeader.appendChild(secretWordLabel);
+        secretWordArea.appendChild(secretWordHeader);
+    
+        let alphabetArea = createElement("div",[["id","alphabet"]]);
+    
+        let alphabet = configModule.getAlphabet();
+        for (let key in alphabet) {
+            let elem = createElement("button", [["id", key],["class","availableButton"]]);
+            elem.innerText = key.toUpperCase() + ":" + alphabet[key];
+            _appendNestedElements(alphabetArea, [elem]);
+        }
+    
+        let cardArea     = createElement("div",[["id","cardContainer"]]);
+        let cards  = configModule.getCards();
+        for (let key in cards) {
+            //upper part of card div that holds the card name,info button
+            let card = createElement("div", [["class", "card"]]);
+            let cardTopDiv = createElement("div", [["class", "cardTop"]]);
+            let infoBtn = createElement("button", [["class", "info"],["title",cards[key].description],["disabled","true"]]);
+            let infoBtnImg = createElement("img",[["src","/img/information-symbol.png"]])
+            _appendNestedElements(infoBtn,[infoBtnImg])
+            let header = createElement("h5", [["class", "none"]]);
+            header.innerText = key.toUpperCase() + " CARD";
+            _appendNestedElements(cardTopDiv, [infoBtn, header]);
+        
+            //bottom part of card div that holds the card cost limit and use button
+            let cardBottomDiv = createElement("div", [["class", "cardBottom"],["id","cardBottom"]]);
+            let limitSpan = createElement("span",[])
+            let limitImage = createElement("img", [["src","/img/item-interconnections.png"]])
+            let labelLimit = createElement("label", [["id",key+"CardLimit"]]);
+            labelLimit.innerText = " : " + cards[key].usageLimit;
+            _appendNestedElements(limitSpan,[limitImage,labelLimit])
+
+            let costSpan = createElement("span",[])
+            let costImage= createElement("img",[["src","/img/diamond24.png"]])
+            let labelCost = createElement("label", [["id","cardCost"]]);
+            labelCost.innerText = " : " + cards[key].cost;
+            _appendNestedElements(costSpan,[costImage,labelCost])
+            let useButton = createElement("button", [["id", key]]);
+            useButton.innerText = "USE";
+        
+            _appendNestedElements(cardBottomDiv, [limitSpan, costSpan, useButton]);
+            _appendNestedElements(card, [cardTopDiv, cardBottomDiv]);
+            _appendNestedElements(cardArea, [card]);
+        }
+        _appendNestedElements(gameContainer,[gameInfo,secretWordArea,alphabetArea]);
+        _appendNestedElements(mainArea,[gameContainer,cardArea]);
+        
+    }
+    return{
+        createEntryLayout,
+        createGameLayout,
+        changeColor,
+        createElement
+    }
+}();
+
 const gameInterfaceModule  = function(){
     let moveJson = {}
+
+    function _alphabetUsage(active){
+        const alphabetButtons = document.getElementById("alphabet").children;
+        for(let child of alphabetButtons){
+            if(!active && child.className=="availableButton"){
+                child.disabled = true;
+                child.className = "disabledButton";
+            }
+            if(active && child.className=="disabledButton"){
+                child.disabled=false;
+                child.className = "availableButton";
+            }
+        }
+    }
+
+    function _updateAlphabetConds(enabledCardContext){
+        if(enabledCardContext.includes("RISK")){
+            _updateAlphabet(configModule.getDiscount('risk'))
+        }
+        else if(enabledCardContext.includes('CONSOLATION')){
+            _updateAlphabet(configModule.getDiscount('consolation'))
+        }
+        else{
+            _updateAlphabet(0)
+        }
+    }
     function _checkCardUsability(response){
         let cards = configModule.getCards();
         let limitOfCards = configModule.getIngameCards();
@@ -60,18 +221,30 @@ const gameInterfaceModule  = function(){
         if(response.enabledCard!="No enabled card"){
             _cardDisabler([])
         }
-
     }
     
+    function _secretWordSeperation(hiddenWord){
+        let elem = document.getElementById("secretWord");
+        while(elem.firstChild){
+            elem.removeChild(elem.firstChild);
+        }
+        for(let i=0;i<hiddenWord.length;i++){
+            let charElem = uiModule.createElement("span",[["id",i]]);
+            charElem.textContent = hiddenWord[i];
+            elem.appendChild(charElem);
+        }
+    }
+
     function updateGameInfo(response){
         if(response.status === "OK"){
             document.getElementById("gameState").textContent=response.message.enabledCard;
             document.getElementById("userPoint").textContent=response.message.userPoint;
-            document.getElementById("secretWord").textContent=response.message.hiddenWord;
+            _secretWordSeperation(response.message.hiddenWord);
             document.getElementById("category").textContent=response.message.category;
             configModule.objectify(response.message.cards);
             _updateCard();
             _checkCardUsability(response.message);
+            _updateAlphabetConds(response.message.enabledCard);
         }
         else{
             alert(response.message)            
@@ -89,7 +262,7 @@ const gameInterfaceModule  = function(){
     function _updateAlphabet(costDiscount){
         let alphabet = configModule.getAlphabet();
         for(let key of Object.keys(alphabet)){
-            document.getElementById(key).innerText = key+":"+(alphabet[key]*(100-costDiscount)/100)
+            document.getElementById(key).innerText = key.toUpperCase()+":"+Math.floor(alphabet[key]*(100-costDiscount)/100)
         }
     }
     function _cardDisabler(elements){
@@ -97,7 +270,7 @@ const gameInterfaceModule  = function(){
         cardArea.forEach(cardButton => {
             if(!elements.includes(cardButton)){
                 cardButton.disabled=true;
-                uiModule.changeColor(cardButton,'red');
+                uiModule.changeColor(cardButton,'black');
             }
             else{
                 cardButton.disabled=false;
@@ -131,6 +304,11 @@ const gameInterfaceModule  = function(){
     function _isLetter(str) {
         return str.length === 1 && str.match(/[a-z]/i);
     }
+    function _isNumber(str){
+        return /^\d+$/.test(str);
+    }
+
+
     function _makeMove(btnID){
         if(btnID==='revealcategory'){
             moveJson.card= btnID;
@@ -141,6 +319,18 @@ const gameInterfaceModule  = function(){
             )
             .catch(error => alert(error))
         }
+        else if(_isNumber(btnID)){
+            if(moveJson.card!=undefined && moveJson.card==='buyletter'){
+                moveJson.pos = Number(btnID);
+                sendRequest("POST","http://localhost:9000/play",moveJson)
+                .then(responseData=>{
+                    updateGameInfo(responseData);
+                    _alphabetUsage(true);
+                    moveJson={};
+                })   
+                .catch(error=>alert(error));  
+            }
+        }
         else{
             if(_isLetter(btnID)){
                 moveJson.letter = btnID;
@@ -148,8 +338,8 @@ const gameInterfaceModule  = function(){
                 .then(responseData => {
                     updateGameInfo(responseData),
                     responseData.message.isSuccess==="correct" 
-                        ? uiModule.changeColor(document.getElementById(btnID),'green') 
-                        : uiModule.changeColor(document.getElementById(btnID),'red'),
+                        ? document.getElementById(btnID).className = "correctButton"
+                        : document.getElementById(btnID).className = "incorrectButton",
                     document.getElementById(btnID).disabled = true;
                     moveJson={}
                 })
@@ -158,12 +348,12 @@ const gameInterfaceModule  = function(){
             else{
                 if(moveJson.card!=undefined){
                     uiModule.changeColor(document.getElementById(moveJson.card),'#0D77B7')
-                }
-                // if(btnID==="discount"){
-                //     _updateAlphabet(configModule.getCards())
-                // }
+                } 
+                btnID==='buyletter' ? _alphabetUsage(false) : _alphabetUsage(true);
                 moveJson.card = btnID;
-                console.log(moveJson.card);
+                if(btnID==='discount'){
+                    _updateAlphabet(configModule.getDiscount(btnID))
+                }
                 uiModule.changeColor(document.getElementById(btnID),'yellow');
             }
         }
@@ -216,155 +406,17 @@ function sendRequest(method, url, body) {
     });
 }
 
-let uiModule = function(){
-    createEntryLayout();
-    function _createElement(elem,attributes){
-        let element = document.createElement(elem);
-        attributes.forEach(x => {
-          element.setAttribute(x[0],x[1]);
-        });
-        return element
-    }
-    
-    function _appendNestedElements(elem,childs){
-      childs.forEach(element => {
-        elem.appendChild(element)
-      });
-    }
-    function changeColor(elem, color){
-        elem.style.background= color;
-    }
-    function createEntryLayout(){
-        let mainArea = document.getElementById("mainArea")
-        let entryContainer = _createElement("div",[["class","entryContainer"],["id","entryContainer"]]);
-        let welcomeHeader = _createElement("h1",[]);
-        welcomeHeader.innerText = "Welcome to Hangman";
-        let levelSelect = _createElement("select",[["id","ddlLevel"]]);
-        let levels = ["easy","medium","hard"]
-        let levelOptions=[]
-        for(let i=0;i<levels.length;i++){
-            levelOptions.push(_createElement("option",[["value",levels[i]]]));
-            levelOptions[i].innerText = levels[i].toUpperCase();
-        }
-        _appendNestedElements(levelSelect,levelOptions);
-        let creationBtn = _createElement("button",[["id","createGameBtn"],["class","giveUpBtn"]]);
-        creationBtn.innerText = "Start Game";
-        _appendNestedElements(entryContainer,[welcomeHeader,levelSelect,creationBtn]);
-        mainArea.appendChild(entryContainer);
-        document.getElementById("createGameBtn").addEventListener("click",function(event){
-            gameInterfaceModule.btnHandler(event.target.id)
-        })
-    }
-    function createGameLayout() {
-        //TODO handle this in a better way.
-        let mainArea = document.getElementById("mainArea");
-        let gameContainer = _createElement("div",[["class", "container"],["id","gameContainer"]]);
-        let gameInfo = _createElement("div",[["class","information"]]);
-    
-        let gameStateHeader = _createElement("h3",[]);
-        let gameStateImg    = _createElement("img",[["src","img/info-16.png"]]);
-        let gameStateLabel  = _createElement("label",[["id","gameState"]]);
-    
-        _appendNestedElements(gameStateHeader,[gameStateImg,gameStateLabel]);
-        gameInfo.appendChild(gameStateHeader);
-    
-        let userPointHeader = _createElement("h3",[]);
-        let userPointImg    = _createElement("img",[["src","img/diamond24.png"]]);
-        let userPointLabel  = _createElement("label",[["id","userPoint"]]);
-        _appendNestedElements(userPointHeader,[userPointImg,userPointLabel]);
-        
-        let categoryHeader  = _createElement("h3",[]);
-        categoryHeader.innerText = "Category: ";
-        let categoryLabel = _createElement("label",[["id","category"]]);
-        categoryHeader.appendChild(categoryLabel);
-        gameInfo.appendChild(categoryHeader);
-    
-        let giveUpBtn = _createElement("button",[["class","giveUpBtn"],["id","giveUpBtn"]]);
-        giveUpBtn.innerText = "Give Up";
-        _appendNestedElements(gameInfo,[userPointHeader,giveUpBtn]);
-    
-        gameContainer.appendChild(gameInfo);
-    
-        let secretWordArea  = _createElement("div",[["class","game"]]);
-        let secretWordHeader= _createElement("h2",[]);
-        secretWordHeader.innerText = "Word: ";
-        let secretWordLabel = _createElement("label",[["id", "secretWord"]]);
-        secretWordHeader.appendChild(secretWordLabel);
-        secretWordArea.appendChild(secretWordHeader);
-    
-        let alphabetArea = _createElement("div",[["id","alphabet"]]);
-    
-        let alphabet = configModule.getAlphabet();
-        for (let key in alphabet) {
-            let elem = _createElement("button", [["id", key]]);
-            elem.innerText = key.toUpperCase() + ":" + alphabet[key];
-            _appendNestedElements(alphabetArea, [elem]);
-        }
-    
-        let cardArea     = _createElement("div",[["id","cardContainer"]]);
-        let cards  = configModule.getCards();
-        for (let key in cards) {
-            //upper part of card div that holds the card name,info button
-            let card = _createElement("div", [["class", "card"]]);
-            let cardTopDiv = _createElement("div", [["class", "cardTop"]]);
-            let infoBtn = _createElement("button", [["class", "info"],["alt",cards[key].description]]);
-            let infoBtnImg = _createElement("img",[["src","/img/information-symbol.png"]])
-            _appendNestedElements(infoBtn,[infoBtnImg])
-            let header = _createElement("h5", [["class", "none"]]);
-            header.innerText = key.toUpperCase() + " CARD";
-            _appendNestedElements(cardTopDiv, [infoBtn, header]);
-        
-            //bottom part of card div that holds the card cost limit and use button
-            let cardBottomDiv = _createElement("div", [["class", "cardBottom"],["id","cardBottom"]]);
-            let limitSpan = _createElement("span",[])
-            let limitImage = _createElement("img", [["src","/img/item-interconnections.png"]])
-            let labelLimit = _createElement("label", [["id",key+"CardLimit"]]);
-            labelLimit.innerText = " : " + cards[key].usageLimit;
-            _appendNestedElements(limitSpan,[limitImage,labelLimit])
-
-            let costSpan = _createElement("span",[])
-            let costImage= _createElement("img",[["src","/img/diamond24.png"]])
-            let labelCost = _createElement("label", [["id","cardCost"]]);
-            labelCost.innerText = " : " + cards[key].cost;
-            _appendNestedElements(costSpan,[costImage,labelCost])
-            let useButton = _createElement("button", [["id", key]]);
-            useButton.innerText = "USE";
-        
-            _appendNestedElements(cardBottomDiv, [limitSpan, costSpan, useButton]);
-            _appendNestedElements(card, [cardTopDiv, cardBottomDiv]);
-            _appendNestedElements(cardArea, [card]);
-        }
-        _appendNestedElements(gameContainer,[gameInfo,secretWordArea,alphabetArea]);
-        _appendNestedElements(mainArea,[gameContainer,cardArea]);
-        
-        gameContainer.style.display = "none";
-        cardArea.style.display = "none";
-    }
-    return{
-        createEntryLayout,
-        createGameLayout,
-        changeColor
-    }
-}();
-
 
 
 
 function buttonAddEvent() {
-    // let alph = document.getElementById("alphabet");
-    // alph.addEventListener('click',function(event){
-    //     if(event.target.type==="submit"){
-    //         gameInterfaceModule.btnHandler(event.target.id);
-    //     }
-    // })
-    // let cards = document.getElementById("cardContainer");
-    // cards.addEventListener('click',function(event){
-    //     if(event.target.type==="submit"){
-    //         gameInterfaceModule.btnHandler(event.target.id);
-    //     }
-    // })
     document.addEventListener('click',function(event){
         if(event.target.type==='submit'){
+            gameInterfaceModule.btnHandler(event.target.id);
+        }
+    })
+    document.getElementById("secretWord").addEventListener('click',function(even){
+        if(event.target.textContent.includes('*')){
             gameInterfaceModule.btnHandler(event.target.id);
         }
     })

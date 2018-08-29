@@ -40,18 +40,10 @@
     left: 0;
 }
 
-.container .game {
+.game {
     display: flex;
     left: 33.3%;
     width: 33.3%;
-}
-
-#secretWord div{
-    display:inline;
-}
-
-.game img {
-    color: #0D77B7;
 }
 
 
@@ -76,8 +68,11 @@
     margin-top: 1%;
 }
 
-#alphabet button {
+#alphabet {
     display: block;
+}
+
+.availableButton {
     height: 50px;
     width: 50px;
     padding: 1px;
@@ -86,7 +81,37 @@
     background: #0D77B7;
     color : white;
     margin: 1% 1% 1% 1%;
+}
 
+.correctButton {
+    height: 50px;
+    width: 50px;
+    padding: 1px;
+    border-radius: 50px 50px 50px 50px;
+    border-color: transparent;
+    background: green;
+    color : white;
+    margin: 1% 1% 1% 1%;
+}
+.incorrectButton{
+    height: 50px;
+    width: 50px;
+    padding: 1px;
+    border-radius: 50px 50px 50px 50px;
+    border-color: transparent;
+    background: red;
+    color : white;
+    margin: 1% 1% 1% 1%;
+}
+.disabledButton{
+    height: 50px;
+    width: 50px;
+    padding: 1px;
+    border-radius: 50px 50px 50px 50px;
+    border-color: transparent;
+    background: black;
+    color : white;
+    margin: 1% 1% 1% 1%;
 }
 
 #cardContainer {
@@ -121,7 +146,6 @@
     border-radius: 50px 50px 50px 50px;
     border-color: transparent;
     background: #0D77B7;
-    pointer-events: none;
     cursor: default;
 }
 
@@ -149,10 +173,6 @@
     background: #0D77B7;
     border-color: transparent;
     margin-top: 3%;
-}
-
-.cardBottom button label {
-    color: #FFFFFF;
 }
 
 .footer {
