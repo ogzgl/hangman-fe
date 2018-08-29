@@ -41,11 +41,14 @@
 }
 
 .container .game {
-    display: inline-block;
+    display: flex;
     left: 33.3%;
     width: 33.3%;
 }
 
+#secretWord div{
+    display:inline;
+}
 
 .game img {
     color: #0D77B7;
@@ -122,6 +125,7 @@
     cursor: default;
 }
 
+
 .cardBottom {
     margin-left: auto;
     margin-right: auto;
@@ -130,8 +134,13 @@
     align-items: center;
 }
 
+.cardBottom img{
+    margin-right: 0.2em;
+}
+
 .cardBottom label {
-    margin-top: 2%;
+    margin-top: 0.5em;
+    float: right;
 }
 
 .cardBottom button {

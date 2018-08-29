@@ -22,57 +22,89 @@ const configModule = function() {
         return cardsConf;
     }
     function objectify(array) {
-        return array.reduce(function(p, c) {
-             p[c[0]] = c[1];
-             return p;
-        }, {});
+        array.forEach(element => {
+            ingameCards[element[0].toLowerCase()] = element[1]
+        });
     }    
+    function getIngameCards(){
+        return ingameCards;
+    }
     let result = {
         setAlphabet : setAlphabet,
         getAlphabet : getAlphabet,
         addCard : addCard,
         getCards : getCards,
-        objectify
+        objectify, objectify,
+        getIngameCards
+
     }
 
     Object.defineProperty(result, 'alphabetConf', { set: setAlphabet });
     Object.defineProperty(result, 'cardsConf', {set : addCard});
+    Object.defineProperty(result, 'ingameCards', {set : objectify});
     return result;
 }();
 
-let moveJson ={};
 const gameInterfaceModule  = function(){
+    let moveJson = {}
     function _checkCardUsability(response){
         let cards = configModule.getCards();
+        let limitOfCards = configModule.getIngameCards();
+        let cardToDisable = []
         for (const key of Object.keys(cards)) {
-            if((response.userPoint<cards[key].lowerLimit) || (response.userPoint>cards[key].upperLimit)){
-                document.getElementById(key).disabled = true;
-                document.getElementById(key).style.background = 'yellow';
-            }
-            else{
-                document.getElementById(key).disabled = false;
-                document.getElementById(key).style.background = '#0D77B7';
+            if(!((response.userPoint<cards[key].lowerLimit) || (response.userPoint>cards[key].upperLimit)) && limitOfCards[key]!=0){
+                cardToDisable.push(document.getElementById(key));
             }
         }
-    }
+        _cardDisabler(cardToDisable);
+        if(response.enabledCard!="No enabled card"){
+            _cardDisabler([])
+        }
 
+    }
+    
     function updateGameInfo(response){
         if(response.status === "OK"){
-            console.log(response);
             document.getElementById("gameState").textContent=response.message.enabledCard;
             document.getElementById("userPoint").textContent=response.message.userPoint;
             document.getElementById("secretWord").textContent=response.message.hiddenWord;
             document.getElementById("category").textContent=response.message.category;
-            _checkCardUsability(response.message);  
+            configModule.objectify(response.message.cards);
+            _updateCard();
+            _checkCardUsability(response.message);
         }
         else{
             alert(response.message)            
         }
     }
-    function _updateAlphabet(costDiscount){
 
+
+    function _updateCard(){
+        let cards = configModule.getIngameCards();
+        for (const key of Object.keys(cards)) {
+            document.getElementById(key+"CardLimit").innerText = cards[key];
+        }
     }
 
+    function _updateAlphabet(costDiscount){
+        let alphabet = configModule.getAlphabet();
+        for(let key of Object.keys(alphabet)){
+            document.getElementById(key).innerText = key+":"+(alphabet[key]*(100-costDiscount)/100)
+        }
+    }
+    function _cardDisabler(elements){
+        let cardArea = Array.from(document.querySelectorAll(".cardBottom button"));
+        cardArea.forEach(cardButton => {
+            if(!elements.includes(cardButton)){
+                cardButton.disabled=true;
+                uiModule.changeColor(cardButton,'red');
+            }
+            else{
+                cardButton.disabled=false;
+                uiModule.changeColor(cardButton,'#0D77B7');
+            }
+        });
+    }
     function _createGameBtn(){
         let e = document.getElementById("ddlLevel");
         let selectedLevel = e.options[e.selectedIndex].value;
@@ -95,73 +127,62 @@ const gameInterfaceModule  = function(){
             error => alert(error)
         )
     }
-    
-    function _makeMove(){
 
+    function _isLetter(str) {
+        return str.length === 1 && str.match(/[a-z]/i);
     }
-    function btnHandler(){
-        console.log("deneme");
-        switch(this.id){
-            case  'createGameBtn' :
-                
+    function _makeMove(btnID){
+        if(btnID==='revealcategory'){
+            moveJson.card= btnID;
+            sendRequest("POST","http://localhost:9000/play",moveJson)
+            .then(responseData => 
+                updateGameInfo(responseData),
+                moveJson={}
+            )
+            .catch(error => alert(error))
+        }
+        else{
+            if(_isLetter(btnID)){
+                moveJson.letter = btnID;
+                sendRequest("POST","http://localhost:9000/play",moveJson)
+                .then(responseData => {
+                    updateGameInfo(responseData),
+                    responseData.message.isSuccess==="correct" 
+                        ? uiModule.changeColor(document.getElementById(btnID),'green') 
+                        : uiModule.changeColor(document.getElementById(btnID),'red'),
+                    document.getElementById(btnID).disabled = true;
+                    moveJson={}
+                })
+                .catch(error=>alert(error));
+            }
+            else{
+                if(moveJson.card!=undefined){
+                    uiModule.changeColor(document.getElementById(moveJson.card),'#0D77B7')
+                }
+                // if(btnID==="discount"){
+                //     _updateAlphabet(configModule.getCards())
+                // }
+                moveJson.card = btnID;
+                console.log(moveJson.card);
+                uiModule.changeColor(document.getElementById(btnID),'yellow');
+            }
         }
 
 
+    }
 
-    //     if(this.id==="createGameBtn"){
-    //         let e = document.getElementById("ddlLevel");
-    //         let selectedLevel = e.options[e.selectedIndex].value;
-    //         let gameCreationJson = {level : selectedLevel}
-    //         sendRequest("POST","http://localhost:9000/",gameCreationJson)
-    //         .then( responseData => {
-    //             if(responseData.status==="OK"){
-    //                 uiModule.createGameLayout();
-    //                 document.getElementById("entryContainer").style.display = "none";
-    //                 document.getElementById("gameContainer").style.display = "flex";
-    //                 document.getElementById("cardContainer").style.display = "flex";
-    //                 updateGameInfo(responseData);
-    //                 buttonAddEvent();
-    //             }
-    //             else{
-    //                 alert(responseData.message)
-    //             }
-    //         })
-    //         .catch(
-    //             error => alert(error)
-    //         )
-    //     }
-    //     let cardArea = document.querySelectorAll(".cardBottom");
-    //     if(Array.from(cardArea).includes(this.parentElement)){
-    //         if(this.id==="revealcategory"){
-    //             sendRequest("POST","http://localhost:9000/play",{card:this.id})
-    //             .then(responseData =>{
-    //                 if(responseData.status==="OK"){
-    //                     updateGameInfo(responseData);
-    //                     this.disabled = true;
-    //                     return;
-    //                 }
-    //             })
-    //         }
-    //         else{
-    //             moveJson.card = this.id
-    //         }
-    //     }
-
-    //     let alphabetArea = document.getElementById("alphabet");        
-    //     if(this.parentElement==alphabetArea){
-    //         moveJson.letter = this.id;
-    //         console.log(moveJson);
-    //         sendRequest("POST","http://localhost:9000/play",moveJson)
-    //         .then(responseData =>{
-    //             if(responseData.status==="OK"){
-    //                 updateGameInfo(responseData);
-    //                 responseData.message.isSuccess==="correct" 
-    //                     ? uiModule.changeColor(this,'green') 
-    //                     : uiModule.changeColor(this,'red');
-    //                 this.disabled = true;
-    //             }
-    //         })
-    //     }
+    function _giveUpBtn(){
+        moveJson.giveUp = "yes";
+        sendRequest("POST","http://localhost:9000/play",moveJson)
+        .then(responseData =>{
+            alert(responseData.message.info+" You "+responseData.message.state.toLowerCase());
+        })
+        .catch(error => alert(error));
+    }
+    function btnHandler(elem){
+        if(elem==='createGameBtn') _createGameBtn();
+        else if(elem==='giveUpBtn') _giveUpBtn();
+        else _makeMove(elem)
     }
 
     return{
@@ -187,7 +208,6 @@ function sendRequest(method, url, body) {
             else {
                 reject(Error(req.statusText));
             }
-            moveJson={}
         };
         req.onerror = function () {
             reject(Error("Network Error"));
@@ -231,7 +251,9 @@ let uiModule = function(){
         creationBtn.innerText = "Start Game";
         _appendNestedElements(entryContainer,[welcomeHeader,levelSelect,creationBtn]);
         mainArea.appendChild(entryContainer);
-        document.getElementById("createGameBtn").addEventListener("click",gameInterfaceModule.btnHandler)
+        document.getElementById("createGameBtn").addEventListener("click",function(event){
+            gameInterfaceModule.btnHandler(event.target.id)
+        })
     }
     function createGameLayout() {
         //TODO handle this in a better way.
@@ -285,22 +307,30 @@ let uiModule = function(){
             //upper part of card div that holds the card name,info button
             let card = _createElement("div", [["class", "card"]]);
             let cardTopDiv = _createElement("div", [["class", "cardTop"]]);
-            let infoBtn = _createElement("button", [["class", "info"]]);
-            infoBtn.innerHTML = "<img src=\"img/information-symbol.png\">";
+            let infoBtn = _createElement("button", [["class", "info"],["alt",cards[key].description]]);
+            let infoBtnImg = _createElement("img",[["src","/img/information-symbol.png"]])
+            _appendNestedElements(infoBtn,[infoBtnImg])
             let header = _createElement("h5", [["class", "none"]]);
             header.innerText = key.toUpperCase() + " CARD";
             _appendNestedElements(cardTopDiv, [infoBtn, header]);
         
             //bottom part of card div that holds the card cost limit and use button
             let cardBottomDiv = _createElement("div", [["class", "cardBottom"],["id","cardBottom"]]);
-            let labelLimit = _createElement("label", []);
-            labelLimit.innerHTML = "<img src=\"img/item-interconnections.png\">:"+ cards[key].usageLimit;
-            let labelCost = _createElement("label", []);
-            labelCost.innerHTML = "<img src=\"img/diamond24.png\"> :" + cards[key].cost;
+            let limitSpan = _createElement("span",[])
+            let limitImage = _createElement("img", [["src","/img/item-interconnections.png"]])
+            let labelLimit = _createElement("label", [["id",key+"CardLimit"]]);
+            labelLimit.innerText = " : " + cards[key].usageLimit;
+            _appendNestedElements(limitSpan,[limitImage,labelLimit])
+
+            let costSpan = _createElement("span",[])
+            let costImage= _createElement("img",[["src","/img/diamond24.png"]])
+            let labelCost = _createElement("label", [["id","cardCost"]]);
+            labelCost.innerText = " : " + cards[key].cost;
+            _appendNestedElements(costSpan,[costImage,labelCost])
             let useButton = _createElement("button", [["id", key]]);
-            useButton.innerHTML = "<label>USE</label>";
+            useButton.innerText = "USE";
         
-            _appendNestedElements(cardBottomDiv, [labelLimit, labelCost, useButton]);
+            _appendNestedElements(cardBottomDiv, [limitSpan, costSpan, useButton]);
             _appendNestedElements(card, [cardTopDiv, cardBottomDiv]);
             _appendNestedElements(cardArea, [card]);
         }
@@ -321,10 +351,23 @@ let uiModule = function(){
 
 
 function buttonAddEvent() {
-    let btns = document.getElementsByTagName("button");
-    for (let i=0;i<btns.length;i++){
-        btns[i].addEventListener('click',gameInterfaceModule.btnHandler);
-    }
+    // let alph = document.getElementById("alphabet");
+    // alph.addEventListener('click',function(event){
+    //     if(event.target.type==="submit"){
+    //         gameInterfaceModule.btnHandler(event.target.id);
+    //     }
+    // })
+    // let cards = document.getElementById("cardContainer");
+    // cards.addEventListener('click',function(event){
+    //     if(event.target.type==="submit"){
+    //         gameInterfaceModule.btnHandler(event.target.id);
+    //     }
+    // })
+    document.addEventListener('click',function(event){
+        if(event.target.type==='submit'){
+            gameInterfaceModule.btnHandler(event.target.id);
+        }
+    })
 };
 
 //for reading alphabet and card config.
