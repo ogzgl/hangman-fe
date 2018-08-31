@@ -5,6 +5,18 @@
     font-family: 'Work Sans', sans-serif;
 }
 
+.containerBlurred{
+    margin-top: 2%;
+    display: flex;
+    flex-wrap: nowrap;
+    font-family: 'Work Sans', sans-serif;
+    -webkit-filter: blur(3px);
+    -moz-filter: blur(3px);
+    -o-filter: blur(3px);
+    -ms-filter: blur(3px);
+    filter: blur(3px);
+}
+
 .topBar {
     margin-top: -1em;
     margin-left: -1em;
@@ -114,13 +126,23 @@
     margin: 1% 1% 1% 1%;
 }
 
-#cardContainer {
+.cardContainer {
     margin-top: 1%;
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
 }
-
+.cardContainerBlurred {
+    margin-top: 1%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    -webkit-filter: blur(3px);
+    -moz-filter: blur(3px);
+    -o-filter: blur(3px);
+    -ms-filter: blur(3px);
+    filter: blur(3px);
+}
 .card {
     border: 1px solid gray;
     margin: 1% 1% 0 1%;
@@ -189,10 +211,38 @@
 }
 
 
-.entryContainer{
-    margin-top: 20%;
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
+.modal {
+    display: block; 
+    position: fixed;
+    z-index: 1;
+    margin-top: 15%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modalNone{
+    display: none;
+}
+.modalContent {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    display: block;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.modalHeader {
+    padding: 2px 16px;
+    align-self: center;
+    background-color: #0D77B7;
+    color: white;
+}
+.modalBody {
+    padding: 2px 16px;
+    display: block;
+    margin: 0 auto;
 }

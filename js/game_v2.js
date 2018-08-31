@@ -8,7 +8,6 @@ const configModule = function() {
     function getAlphabet(){
         return alphabetConf;
     }
-
     function addCard(response){
         cardsConf.buyletter = response.buyletter;
         cardsConf.consolation = response.consolation;
@@ -49,6 +48,7 @@ const configModule = function() {
 
 let uiModule = function(){
     createEntryLayout();
+    createFinishedGameLayout();
     function createElement(elem,attributes){
         let element = document.createElement(elem);
         attributes.forEach(x => {
@@ -65,13 +65,19 @@ let uiModule = function(){
     function changeColor(elem, color){
         elem.style.background= color;
     }
+
     function createEntryLayout(){
         let mainArea = document.getElementById("mainArea")
-        let modalContainer = createElement("div",[["class","modal"]]);
-        let entryContainer = createElement("div",[["class","entryContainer"],["id","entryContainer"]]);
+        let modalContainer = createElement("div",[["class","modal"],["id","entryModal"]]);
+        let modalContent = createElement("div",[["class","modalContent"],["id","entryContainer"]]);
+
+        let modalHeader = createElement("div",[["class","modalHeader"]]);
         let closeBtn = createElement("span",[["class","close"]]);
         let welcomeHeader = createElement("h1",[]);
         welcomeHeader.innerText = "Welcome to Hangman";
+        _appendNestedElements(modalHeader,[closeBtn,welcomeHeader]);
+        
+        let modalBody = createElement("div",[["class","modalBody"]]);
         let levelSelect = createElement("select",[["id","ddlLevel"]]);
         let levels = ["easy","medium","hard"]
         let levelOptions=[]
@@ -82,17 +88,45 @@ let uiModule = function(){
         _appendNestedElements(levelSelect,levelOptions);
         let creationBtn = createElement("button",[["id","createGameBtn"],["class","giveUpBtn"]]);
         creationBtn.innerText = "Start Game";
-        _appendNestedElements(entryContainer,[closeBtn,welcomeHeader,levelSelect,creationBtn]);
-        modalContainer.appendChild(entryContainer);
-        mainArea.appendChild(entryContainer);
+        _appendNestedElements(modalBody,[levelSelect,creationBtn]);
+
+        _appendNestedElements(modalContent,[modalHeader,modalBody])
+        modalContainer.appendChild(modalContent)
+        mainArea.appendChild(modalContainer);
+
         document.getElementById("createGameBtn").addEventListener("click",function(event){
             gameInterfaceModule.btnHandler(event.target.id)
         })
     }
+    function createFinishedGameLayout(){
+        let mainArea = document.getElementById("mainArea")
+
+        let modalContainer = createElement("div",[["class","modalNone"],["id","finishedModal"]]);
+        let modalContent = createElement("div",[["class","modalContent"],["id","finishedContainer"]]);
+
+        let modalHeader = createElement("div",[["class","modalHeader"]]);
+        let closeBtn = createElement("span",[["class","close"]]);
+        let welcomeHeader = createElement("h1",[["id","finishedGameHeader"]]);
+        welcomeHeader.innerText = "";
+        _appendNestedElements(modalHeader,[closeBtn,welcomeHeader]);
+        
+        let modalBody = createElement("div",[["class","modalBody"]]);
+        let creationBtn = createElement("button",[["id","playAgainBtn"],["class","giveUpBtn"]]);
+        creationBtn.innerText = "Play Again";
+        _appendNestedElements(modalBody,[creationBtn]);
+
+        _appendNestedElements(modalContent,[modalHeader,modalBody])
+        modalContainer.appendChild(modalContent)
+        mainArea.appendChild(modalContainer);
+        document.getElementById("playAgainBtn").addEventListener("click",function(event){
+            gameInterfaceModule.btnHandler(event.target.id);
+        })
+    }
+
     function createGameLayout() {
         //TODO handle this in a better way.
         let mainArea = document.getElementById("mainArea");
-        let gameContainer = createElement("div",[["class", "container"],["id","gameContainer"]]);
+        let gameContainer = createElement("div",[["class", "containerBlurred"],["id","gameContainer"]]);
         let gameInfo = createElement("div",[["class","information"]]);
     
         let gameStateHeader = createElement("h3",[]);
@@ -110,6 +144,7 @@ let uiModule = function(){
         let categoryHeader  = createElement("h3",[]);
         categoryHeader.innerText = "Category: ";
         let categoryLabel = createElement("label",[["id","category"]]);
+        categoryLabel.innerText = "**************"
         categoryHeader.appendChild(categoryLabel);
         gameInfo.appendChild(categoryHeader);
     
@@ -123,6 +158,7 @@ let uiModule = function(){
         let secretWordHeader= createElement("h2",[]);
         secretWordHeader.innerText = "Word: ";
         let secretWordLabel = createElement("span",[["id", "secretWord"],["class","secretWordGame"]]);
+        secretWordLabel.innerText = "*************"
         secretWordHeader.appendChild(secretWordLabel);
         secretWordArea.appendChild(secretWordHeader);
     
@@ -135,7 +171,7 @@ let uiModule = function(){
             _appendNestedElements(alphabetArea, [elem]);
         }
     
-        let cardArea     = createElement("div",[["id","cardContainer"]]);
+        let cardArea     = createElement("div",[["id","cardContainer"],["class","cardContainerBlurred"]]);
         let cards  = configModule.getCards();
         for (let key in cards) {
             //upper part of card div that holds the card name,info button
@@ -175,6 +211,7 @@ let uiModule = function(){
     return{
         createEntryLayout,
         createGameLayout,
+        createFinishedGameLayout,
         changeColor,
         createElement
     }
@@ -212,14 +249,16 @@ const gameInterfaceModule  = function(){
         let cards = configModule.getCards();
         let limitOfCards = configModule.getIngameCards();
         let cardToDisable = []
-        for (const key of Object.keys(cards)) {
-            if(!((response.userPoint<cards[key].lowerLimit) || (response.userPoint>cards[key].upperLimit)) && limitOfCards[key]!=0){
-                cardToDisable.push(document.getElementById(key));
+        if(response!=undefined){
+            for (const key of Object.keys(cards)) {
+                if(!((response.userPoint<cards[key].lowerLimit) || (response.userPoint>cards[key].upperLimit)) && limitOfCards[key]!=0){
+                    cardToDisable.push(document.getElementById(key));
+                }
             }
-        }
-        _cardDisabler(cardToDisable);
-        if(response.enabledCard!="No enabled card"){
-            _cardDisabler([])
+            _cardDisabler(cardToDisable);
+            if(response.enabledCard!="No enabled card"){
+                _cardDisabler([])
+            }
         }
     }
     
@@ -245,6 +284,12 @@ const gameInterfaceModule  = function(){
             _updateCard();
             _checkCardUsability(response.message);
             _updateAlphabetConds(response.message.enabledCard);
+        }
+        else if(response.status === 'DONE'){
+            document.getElementById("gameContainer").className = "containerBlurred";
+            document.getElementById("cardContainer").className = "cardContainerBlurred";
+            document.getElementById("finishedGameHeader").textContent = response.message.info;
+            document.getElementById("finishedModal").className = "modal";
         }
         else{
             alert(response.message)            
@@ -278,6 +323,19 @@ const gameInterfaceModule  = function(){
             }
         });
     }
+    function _clearGame(){
+        let alphabet = configModule.getAlphabet();
+        let cards    = configModule.getCards();
+        for(let key in alphabet){
+            document.getElementById(key).className = 'availableButton'
+            document.getElementById(key).disabled = false;
+        }
+        for(let card in cards){
+            uiModule.changeColor(document.getElementById(card),"#0D77B7");
+            document.getElementById(card).disabled = false;
+        }
+        _checkCardUsability()
+    }
     function _createGameBtn(){
         let e = document.getElementById("ddlLevel");
         let selectedLevel = e.options[e.selectedIndex].value;
@@ -285,12 +343,11 @@ const gameInterfaceModule  = function(){
         sendRequest("POST","http://localhost:9000/",gameCreationJson)
         .then( responseData => {
             if(responseData.status==="OK"){
-                uiModule.createGameLayout();
-                document.getElementById("entryContainer").style.display = "none";
-                document.getElementById("gameContainer").style.display = "flex";
-                document.getElementById("cardContainer").style.display = "flex";
+                document.getElementById("gameContainer").className = "container";
+                document.getElementById("cardContainer").className = "cardContainer";
                 updateGameInfo(responseData);
                 buttonAddEvent();
+                document.getElementById('entryModal').className = 'modalNone';
             }
             else{
                 alert(responseData.message)
@@ -334,6 +391,7 @@ const gameInterfaceModule  = function(){
         else{
             if(_isLetter(btnID)){
                 moveJson.letter = btnID;
+                console.log(moveJson);
                 sendRequest("POST","http://localhost:9000/play",moveJson)
                 .then(responseData => {
                     updateGameInfo(responseData),
@@ -360,18 +418,26 @@ const gameInterfaceModule  = function(){
 
 
     }
-
+    function _playAgain(){
+        document.getElementById("finishedModal").className = "modalNone";
+        document.getElementById("entryModal").className = "modal"
+        removeEvent();
+        _clearGame();
+    }
+    
     function _giveUpBtn(){
         moveJson.giveUp = "yes";
         sendRequest("POST","http://localhost:9000/play",moveJson)
         .then(responseData =>{
-            alert(responseData.message.info+" You "+responseData.message.state.toLowerCase());
+            updateGameInfo(responseData)
         })
         .catch(error => alert(error));
+        moveJson = {};
     }
     function btnHandler(elem){
         if(elem==='createGameBtn') _createGameBtn();
         else if(elem==='giveUpBtn') _giveUpBtn();
+        else if(elem==='playAgainBtn') _playAgain();
         else _makeMove(elem)
     }
 
@@ -406,20 +472,25 @@ function sendRequest(method, url, body) {
     });
 }
 
+let handlerFunction = function(event){
+    if(event.target.type==='submit'){
+        gameInterfaceModule.btnHandler(event.target.id);
+    }
+    if(event.target.textContent.includes('*')){
+        gameInterfaceModule.btnHandler(event.target.id);
+    }
+}
 
-
+function removeEvent(){
+    document.removeEventListener('click',handlerFunction)
+    document.getElementById("secretWord").removeEventListener('click',handlerFunction)
+}
 
 function buttonAddEvent() {
-    document.addEventListener('click',function(event){
-        if(event.target.type==='submit'){
-            gameInterfaceModule.btnHandler(event.target.id);
-        }
-    })
-    document.getElementById("secretWord").addEventListener('click',function(even){
-        if(event.target.textContent.includes('*')){
-            gameInterfaceModule.btnHandler(event.target.id);
-        }
-    })
+    document.getElementById("alphabet").addEventListener('click',handlerFunction)
+    document.getElementById("cardContainer").addEventListener("click",handlerFunction)
+    document.getElementById("secretWord").addEventListener('click',handlerFunction)
+    document.getElementById("giveUpBtn").addEventListener("click",handlerFunction)
 };
 
 //for reading alphabet and card config.
@@ -428,6 +499,7 @@ sendRequest("GET","http://localhost:9000")
     {
         configModule.setAlphabet(responseData);
         configModule.addCard(responseData);
+        uiModule.createGameLayout();
     })
 .catch(
     error => console.log(error)
