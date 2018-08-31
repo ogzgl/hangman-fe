@@ -65,7 +65,11 @@ let uiModule = function(){
     function changeColor(elem, color){
         elem.style.background= color;
     }
-
+    function howToPlayLayout(){
+        let deneme = createElement("label",[])
+        deneme.innerText = "denememme";
+        return deneme;
+    }
     function createEntryLayout(){
         let mainArea = document.getElementById("mainArea")
         let modalContainer = createElement("div",[["class","modal"],["id","entryModal"]]);
@@ -213,6 +217,7 @@ let uiModule = function(){
         createGameLayout,
         createFinishedGameLayout,
         changeColor,
+        howToPlayLayout,
         createElement
     }
 }();
@@ -224,10 +229,12 @@ const gameInterfaceModule  = function(){
         const alphabetButtons = document.getElementById("alphabet").children;
         for(let child of alphabetButtons){
             if(!active && child.className=="availableButton"){
+                document.getElementById("secretWord").style.border = "1px solid #0D77B7";
                 child.disabled = true;
                 child.className = "disabledButton";
             }
             if(active && child.className=="disabledButton"){
+                document.getElementById("secretWord").style.border = "";
                 child.disabled=false;
                 child.className = "availableButton";
             }
@@ -375,6 +382,7 @@ const gameInterfaceModule  = function(){
                 moveJson={}
             )
             .catch(error => alert(error))
+            _alphabetUsage(true);
         }
         else if(_isNumber(btnID)){
             if(moveJson.card!=undefined && moveJson.card==='buyletter'){
@@ -391,7 +399,6 @@ const gameInterfaceModule  = function(){
         else{
             if(_isLetter(btnID)){
                 moveJson.letter = btnID;
-                console.log(moveJson);
                 sendRequest("POST","http://localhost:9000/play",moveJson)
                 .then(responseData => {
                     updateGameInfo(responseData),
